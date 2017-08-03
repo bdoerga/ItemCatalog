@@ -6,6 +6,9 @@
 		<div>
 			<p>{{i.name}}</p>
 			<p>{{i.description}}</p>
+			<a href='{{url_for('editItem', category_id = category.id, item_id = i.id) }}'>Edit</a>
+			</br>
+			<a href = '{{url_for('deleteItem', category_id = category.id, item_id = i.id ) }}'>Delete</a>
 		</div>
 		{% endfor %}
 	</body>
