@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, render_template
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from database_setup import Base, Category, Item
@@ -15,14 +15,7 @@ session = DBSession()
 def categoryItems(category_id):
     category = session.query(Category).filter_by(id=category_id).one()
     items = session.query(Item).filter_by(category_id=category.id)
-    output = ''
-    for i in items:
-        output += i.name
-        output += '</br>'
-        output += i.description        
-        output += '</br>'
-        output += '</br>'
-    return output
+    return render_template('item.html', category=category, items=items)
 
 @app.route('/category/<int:category_id>/new/')
 def newItem(category_id):
