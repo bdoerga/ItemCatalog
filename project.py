@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, jsonify
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from database_setup import Base, Category, Item
@@ -56,6 +56,13 @@ def deleteItem(category_id, item_id):
         return redirect(url_for('categoryItems', category_id=category_id))
     else:
         return render_template('deleteitem.html', item=itemToDelete)
+
+
+# JSON endpoint for single item
+@app.route('/item/<int:item_id>/JSON/')
+def itemJSON(item_id):
+    item = session.query(Item).filter_by(id=item_id).one()
+    return jsonify(Item=item.serialize)
 
 
 if __name__ == '__main__':
