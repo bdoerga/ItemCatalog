@@ -31,6 +31,7 @@ session = DBSession()
 def showLogin():
     return render_template('login.html')
 
+
 # Google Authentication process
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
@@ -81,8 +82,8 @@ def gconnect():
     stored_access_token = login_session.get('access_token')
     stored_gplus_id = login_session.get('gplus_id')
     if stored_access_token is not None and gplus_id == stored_gplus_id:
-        response = make_response(json.dumps('Current user is already connected.'),
-                                 200)
+        response = make_response(
+            json.dumps('Current user is already connected.'), 200)
         response.headers['Content-Type'] = 'application/json'
         return response
 
@@ -107,7 +108,9 @@ def gconnect():
     output += '!</h1>'
     output += '<img src="'
     output += login_session['picture']
-    output += ' " style = "width: 300px; height: 300px;border-radius: 150px;-webkit-border-radius: 150px;-moz-border-radius: 150px;"> '
+    output += ''' " style = "width: 300px; height: 300px;
+    border-radius: 150px;-webkit-border-radius: 150px;
+    -moz-border-radius: 150px;"> '''
     print "done!"
     return output
 
@@ -118,13 +121,15 @@ def gdisconnect():
     access_token = login_session.get('access_token')
     if access_token is None:
         print 'Access Token is None'
-        response = make_response(json.dumps('Current user not connected.'), 401)
+        response = make_response(
+            json.dumps('Current user not connected.'), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
     print 'In gdisconnect access token is %s', access_token
     print 'User name is: '
     print login_session['username']
-    url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % login_session['access_token']
+    url = '''https://accounts.google.com/
+    o/oauth2/revoke?token=%s''' % login_session['access_token']
     h = httplib2.Http()
     result = h.request(url, 'GET')[0]
     print 'result is '
@@ -139,9 +144,11 @@ def gdisconnect():
         response.headers['Content-Type'] = 'application/json'
         return response
     else:
-        response = make_response(json.dumps('Failed to revoke token for given user.', 400))
+        response = make_response(
+            json.dumps('Failed to revoke token for given user.', 400))
         response.headers['Content-Type'] = 'application/json'
         return response
+
 
 # Shows all items based on category id
 @app.route('/categories/<int:category_id>/')
@@ -151,8 +158,10 @@ def categoryItems(category_id):
     if 'username' in login_session:
         loggedIn = True
     else:
-        loggedIn = False    
-    return render_template('item.html', category=category, items=items, loggedIn=loggedIn)
+        loggedIn = False
+    return render_template(
+        'item.html', category=category, items=items, loggedIn=loggedIn)
+
 
 # Create new item for category
 @app.route('/category/<int:category_id>/new/', methods=['GET', 'POST'])
@@ -161,7 +170,9 @@ def newItem(category_id):
         return redirect('/login')
     if request.method == 'POST':
         newItem = Item(
-            name=request.form['name'], description=request.form['description'], category_id=category_id)
+            name=request.form['name'],
+            description=request.form['description'],
+            category_id=category_id)
         session.add(newItem)
         session.commit()
         return redirect(url_for('categoryItems', category_id=category_id))
@@ -170,7 +181,8 @@ def newItem(category_id):
 
 
 # Edits chosen item
-@app.route('/category/<int:category_id>/<int:item_id>/edit/', methods=['GET', 'POST'])
+@app.route('''/category/<int:category_id>/
+    <int:item_id>/edit/''', methods=['GET', 'POST'])
 def editItem(category_id, item_id):
     if 'username' not in login_session:
         return redirect('/login')
@@ -178,7 +190,7 @@ def editItem(category_id, item_id):
     if request.method == 'POST':
         if request.form['name']:
             editedItem.name = request.form['name']
-        if request.form['description']:    
+        if request.form['description']:
             editedItem.description = request.form['description']
         session.add(editedItem)
         session.commit()
@@ -187,8 +199,10 @@ def editItem(category_id, item_id):
         return render_template(
             'edititem.html', category_id=category_id, item=editedItem)
 
+
 # Deletes item from database
-@app.route('/category/<int:category_id>/<int:item_id>/delete/', methods=['GET', 'POST'])
+@app.route('''/category/<int:category_id>/
+    <int:item_id>/delete/''', methods=['GET', 'POST'])
 def deleteItem(category_id, item_id):
     if 'username' not in login_session:
         return redirect('/login')
