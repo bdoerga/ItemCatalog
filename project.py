@@ -31,7 +31,7 @@ session = DBSession()
 def showLogin():
     return render_template('login.html')
 
-
+# Google Authentication process
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
 
@@ -143,7 +143,7 @@ def gdisconnect():
         response.headers['Content-Type'] = 'application/json'
         return response
 
-
+# Shows all items based on category id
 @app.route('/categories/<int:category_id>/')
 def categoryItems(category_id):
     category = session.query(Category).filter_by(id=category_id).one()
@@ -154,7 +154,7 @@ def categoryItems(category_id):
         loggedIn = False    
     return render_template('item.html', category=category, items=items, loggedIn=loggedIn)
 
-
+# Create new item for category
 @app.route('/category/<int:category_id>/new/', methods=['GET', 'POST'])
 def newItem(category_id):
     if 'username' not in login_session:
@@ -169,7 +169,7 @@ def newItem(category_id):
         return render_template('newitem.html', category_id=category_id)
 
 
-
+# Edits chosen item
 @app.route('/category/<int:category_id>/<int:item_id>/edit/', methods=['GET', 'POST'])
 def editItem(category_id, item_id):
     if 'username' not in login_session:
@@ -187,7 +187,7 @@ def editItem(category_id, item_id):
         return render_template(
             'edititem.html', category_id=category_id, item=editedItem)
 
-
+# Deletes item from database
 @app.route('/category/<int:category_id>/<int:item_id>/delete/', methods=['GET', 'POST'])
 def deleteItem(category_id, item_id):
     if 'username' not in login_session:
