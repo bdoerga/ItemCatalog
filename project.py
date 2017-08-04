@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify
+from flask import session as login_session
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from database_setup import Base, Category, Item
@@ -9,6 +10,12 @@ Base.metadata.bind = engine
 
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
+
+
+# Login
+@app.route('/login')
+def showLogin():
+    return render_template('login.html')
 
 
 @app.route('/categories/<int:category_id>/')
