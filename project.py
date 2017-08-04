@@ -148,7 +148,11 @@ def gdisconnect():
 def categoryItems(category_id):
     category = session.query(Category).filter_by(id=category_id).one()
     items = session.query(Item).filter_by(category_id=category.id)
-    return render_template('item.html', category=category, items=items)
+    if 'username' in login_session:
+        loggedIn = True
+    else:
+        loggedIn = False    
+    return render_template('item.html', category=category, items=items, loggedIn=loggedIn)
 
 
 @app.route('/category/<int:category_id>/new/', methods=['GET', 'POST'])
