@@ -1,5 +1,11 @@
 <html>
 	<body>
+		{% if loggedIn %}
+			<a href='{{url_for('gdisconnect')}}'>Logout</a>
+		{% else %}
+			<a href='{{url_for('showLogin')}}'>Login</a>
+		{% endif %}
+
 		<h1>Choose Category:</h1>
 		{% for category in categories %}
 		<div>

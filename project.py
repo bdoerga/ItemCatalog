@@ -30,7 +30,11 @@ session = DBSession()
 @app.route('/')
 def showCategories():
     categories = session.query(Category)
-    return render_template('categories.html', categories=categories)
+    if 'username' in login_session:
+        loggedIn = True
+    else:
+        loggedIn = False
+    return render_template('categories.html', categories=categories, loggedIn=loggedIn)
 
 
 # Login
