@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, jsonify
 from flask import session as login_session
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from database_setup import Base, Category, Item
+from database_setup import Base, Category, Item, User
 
 # Authetication imports
 from oauth2client.client import flow_from_clientsecrets
@@ -19,11 +19,18 @@ CLIENT_ID = json.loads(
 APPLICATION_NAME = "Restaurant Menu Application"
 
 
-engine = create_engine('sqlite:///itemcatalog.db')
+engine = create_engine('sqlite:///itemcatalogwithusers.db')
 Base.metadata.bind = engine
 
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
+
+
+# Home page
+@app.route('/')
+def showCategories():
+    categories = session.query(Category)
+    return render_template('categories.html', categories=categories)
 
 
 # Login
@@ -31,6 +38,10 @@ session = DBSession()
 def showLogin():
     return render_template('login.html')
 
+# Show user he's unauthorized
+@app.route('/unauthorized')
+def showUnauthorized():
+    return render_template('unauthorized.html')
 
 # Google Authentication process
 @app.route('/gconnect', methods=['POST'])
@@ -102,6 +113,12 @@ def gconnect():
     login_session['picture'] = data['picture']
     login_session['email'] = data['email']
 
+    # See if user exists, if it doesn't make a new one
+    user_id = getUserIDFromEmail(login_session['email'])
+    if not user_id:
+        user_id = createUser(login_session)
+    login_session['user_id'] = user_id
+
     output = ''
     output += '<h1>Welcome, '
     output += login_session['username']
@@ -113,6 +130,37 @@ def gconnect():
     -moz-border-radius: 150px;"> '''
     print "done!"
     return output
+
+
+# User Helper Functions
+def createUser(login_session):
+    newUser = User(name=login_session['username'], email=login_session[
+                   'email'], picture=login_session['picture'])
+    session.add(newUser)
+    session.commit()
+    user = session.query(User).filter_by(email=login_session['email']).one()
+    return user.id
+
+
+def getUserInfo(user_id):
+    user = session.query(User).filter_by(id=user_id).one()
+    return user
+
+
+def getUserIDFromEmail(email):
+    try:
+        user = session.query(User).filter_by(email=email).one()
+        return user.id
+    except:
+        return None
+
+
+def getUserIDFromItemID(item_id):
+    try:
+        item = session.query(Item).filter_by(id=item_id).one()
+        return item.user_id
+    except:
+        return None
 
 
 # DISCONNECT - Revoke a current user's token and reset their login_session
@@ -172,7 +220,8 @@ def newItem(category_id):
         newItem = Item(
             name=request.form['name'],
             description=request.form['description'],
-            category_id=category_id)
+            category_id=category_id,
+            user_id=login_session['user_id'])
         session.add(newItem)
         session.commit()
         return redirect(url_for('categoryItems', category_id=category_id))
@@ -186,6 +235,9 @@ def newItem(category_id):
 def editItem(category_id, item_id):
     if 'username' not in login_session:
         return redirect('/login')
+    user_id = getUserIDFromItemID(item_id)
+    if user_id != login_session['user_id']:
+        return redirect('/unauthorized')
     editedItem = session.query(Item).filter_by(id=item_id).one()
     if request.method == 'POST':
         if request.form['name']:
@@ -206,6 +258,9 @@ def editItem(category_id, item_id):
 def deleteItem(category_id, item_id):
     if 'username' not in login_session:
         return redirect('/login')
+    user_id = getUserIDFromItemID(item_id)
+    if user_id != login_session['user_id']:
+        return redirect('/unauthorized')
     itemToDelete = session.query(Item).filter_by(id=item_id).one()
     if request.method == 'POST':
         session.delete(itemToDelete)

@@ -1,0 +1,10 @@
+<html>
+	<body>
+		<h1>Choose Category:</h1>
+		{% for category in categories %}
+		<div>
+			<a href='{{url_for('categoryItems', category_id = category.id) }}'>{{category.name}}</a>
+		</div>
+		{% endfor %}
+	</body>
+</html>
