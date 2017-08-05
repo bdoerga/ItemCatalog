@@ -16,5 +16,5 @@ This project contains a web app called Item catalog which lets you add, edit and
 
 ## How to run:
 - Go to vagrant directory and insert this project directory.
-- Run project.py inside the project directory to start the web-app on port 5000.
+- Run `python project.py` inside the project directory to start the web-app on port 5000.
 - visit http://localhost:5000/categories/*/, with  * is equal to 1, 2 or 3 in your browser.

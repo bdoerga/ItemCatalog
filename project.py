@@ -34,7 +34,8 @@ def showCategories():
         loggedIn = True
     else:
         loggedIn = False
-    return render_template('categories.html', categories=categories, loggedIn=loggedIn)
+    return render_template(
+        'categories.html', categories=categories, loggedIn=loggedIn)
 
 
 # Login
@@ -42,10 +43,12 @@ def showCategories():
 def showLogin():
     return render_template('login.html')
 
+
 # Show user he's unauthorized
 @app.route('/unauthorized')
 def showUnauthorized():
     return render_template('unauthorized.html')
+
 
 # Google Authentication process
 @app.route('/gconnect', methods=['POST'])
