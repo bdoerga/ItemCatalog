@@ -4,9 +4,6 @@ Jinja2
 PAM
 PyYAML
 SQLAlchemy
-Twisted-Core
-Twisted-Names
-Twisted-Web
 Werkzeug
 apt-xapian-index
 argparse
