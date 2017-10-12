@@ -1,7 +1,6 @@
 Cheetah
 Flask
 Jinja2
-Landscape-Client
 PAM
 PyYAML
 SQLAlchemy
